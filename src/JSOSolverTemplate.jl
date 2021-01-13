@@ -8,5 +8,6 @@ using NLPModels
 using SolverTools
 
 include("uncsolver.jl")
+include("gradienteCon.jl")
 
 end # module
