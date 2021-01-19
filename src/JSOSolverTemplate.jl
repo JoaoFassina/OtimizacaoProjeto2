@@ -10,5 +10,6 @@ using SolverTools
 include("uncsolver.jl")
 include("gradienteCon.jl")
 include("STCG.jl")
+include("bfgs.jl")
 
 end # module
