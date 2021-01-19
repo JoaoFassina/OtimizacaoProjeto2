@@ -2,7 +2,7 @@ export bfgs, ldlt, bfgs_update!, solve_ldlt
 using CUTEst
 using NLPModels, LinearOperators, Krylov, SolverTools, SolverBenchmark,JuMP, Ipopt
 
-function bfgs(nlp; tol = 1e-5, max_iter = 1000, max_time = 60)
+function bfgs(nlp; tol = 1e-5, max_iter = 10000, max_time = 3)
 
   x = copy(nlp.meta.x0)
   f(x) = obj(nlp,x)
