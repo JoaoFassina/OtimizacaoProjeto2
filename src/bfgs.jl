@@ -1,8 +1,8 @@
-export bfgs, ldlt, bfgs_update!, solve_ldlt
+export bfgs, ldlt1, bfgs_update!, solve_ldlt
 using CUTEst
 using NLPModels, LinearOperators, Krylov, SolverTools, SolverBenchmark,JuMP, Ipopt
 
-function bfgs(nlp; tol = 1e-5, max_iter = 10000, max_time = 3)
+function bfgs(nlp; tol = 1e-5, max_iter = 1000, max_time = 3)
 
   x = copy(nlp.meta.x0)
   f(x) = obj(nlp,x)
@@ -24,7 +24,7 @@ function bfgs(nlp; tol = 1e-5, max_iter = 10000, max_time = 3)
     t=1.0;
     p=dot(gx,d);
     #achar o passo - wolfe
-    while f(x+t*d) > fx + 1e-4*t*p || dot(g(x+t*d),d) < 0.9*p
+    while f(x+t*d) > fx + 1e-4*t*p || dot(g(x+t*d),d) < 0.9*p || t <= eps(Float64)
       t=t*0.9
     end
     s = t*d
@@ -33,7 +33,7 @@ function bfgs(nlp; tol = 1e-5, max_iter = 10000, max_time = 3)
     g_prox = g(x)
     y = g_prox - gx
     bfgs_update!(B, s, y)
-    L,D = ldlt(B)
+    L,D = ldlt1(B)
     d = solve_ldlt(L,D,-g_prox) # LDLt * d = - grad
     gx = g_prox
     k = k + 1
@@ -81,7 +81,7 @@ end
 
 #-----------------------------------------------------------------------------
 
-function ldlt(A)
+function ldlt1(A)
 
   (n,n) = size(A)
   L = Matrix{Float64}(I, n, n)
