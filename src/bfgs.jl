@@ -24,7 +24,7 @@ function bfgs(nlp; tol = 1e-5, max_iter = 1000, max_time = 3)
     t=1.0;
     p=dot(gx,d);
     #achar o passo - wolfe
-    while f(x+t*d) > fx + 1e-4*t*p || dot(g(x+t*d),d) < 0.9*p || t <= eps(Float64)
+    while (f(x+t*d) > fx + 1e-4*t*p || dot(g(x+t*d),d) < 0.9*p) && t >= eps(Float64)
       t=t*0.9
     end
     s = t*d
