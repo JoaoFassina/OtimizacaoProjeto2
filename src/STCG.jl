@@ -109,7 +109,10 @@ function STCG(nlp)
             status = :max_iter
             break
         end
-
+        if Δt > max_time
+            status = :max_time
+            break
+        end
     end
 
     if norm(∇f(x)) <= ϵ
