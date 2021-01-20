@@ -2,9 +2,9 @@ export bfgs, ldlt1, bfgs_update!, solve_ldlt
 using CUTEst
 using NLPModels, LinearOperators, Krylov, SolverTools, SolverBenchmark,JuMP, Ipopt
 
-function bfgs(nlp; tol = 1e-5, max_iter = 1000, max_time = 3)
+function bfgs(nlp; x :: AbstractVector=copy(nlp.meta.x0),
+  atol :: Real=√eps(eltype(x)), rtol :: Real=√eps(eltype(x)), max_iter = 100_000, max_time = 3)
 
-  x = copy(nlp.meta.x0)
   f(x) = obj(nlp,x)
   fx = f(x)
   ef = 0
@@ -16,10 +16,10 @@ function bfgs(nlp; tol = 1e-5, max_iter = 1000, max_time = 3)
   gx = g(x)
   d = -1*gx
   B = Matrix{Float64}(I, n, n) #eye(n)
-  
+  ϵ = atol + rtol * norm(gx)
   status =:unknown
 
-  while norm(gx) > tol
+  while norm(gx) > ϵ
 
     t=1.0;
     p=dot(gx,d);

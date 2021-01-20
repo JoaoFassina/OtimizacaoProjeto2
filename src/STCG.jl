@@ -4,14 +4,13 @@ using LinearAlgebra
 using CUTEst
 using NLPModels, LinearOperators, Krylov, SolverTools, SolverBenchmark,JuMP, Ipopt
 
-function STCG(nlp)
+function STCG(nlp;x :: AbstractVector=copy(nlp.meta.x0),
+    atol :: Real=√eps(eltype(x)), rtol :: Real=√eps(eltype(x)),max_iter = 10000)
     t₀ = time()
     Δt = time() - t₀
 
-    max_iter = 1000
     max_time = 3
-    ϵ = 1e-4
-    x = copy(nlp.meta.x0)
+    ϵ = atol + rtol * norm(gx)
     f(x) = obj(nlp,x)
     ∇f(x) = grad(nlp,x)
     H(x) = hess(nlp,x)
@@ -109,10 +108,12 @@ function STCG(nlp)
             status = :max_iter
             break
         end
+
         if Δt > max_time
             status = :max_time
             break
         end
+
     end
 
     if norm(∇f(x)) <= ϵ

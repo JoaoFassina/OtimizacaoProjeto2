@@ -1,10 +1,18 @@
 export gradienteCon
-function gradienteCon(nlp ; max_time = 10, max_iter = 100_000, η₁ = 1e-2, atol = 1e-6 ,rtol = 1e-6)
+
+using ForwardDiff
+using JSOSolverTemplate
+using LinearAlgebra
+using CUTEst
+using NLPModels, LinearOperators, Krylov, SolverTools, SolverBenchmark
+
+
+function gradienteCon(nlp ;x :: AbstractVector=copy(nlp.meta.x0),
+    atol :: Real=√eps(eltype(x)), rtol :: Real=√eps(eltype(x)), max_time = 3, max_iter = 100_000, η₁ = 1e-2)
     t₀ = time()
     Δt = time() - t₀
     iter = 0
     
-    x = copy(nlp.meta.x0)
     f(x) = obj(nlp,x)
     ∇f(x) = grad(nlp,x)
     fx = f(x)
