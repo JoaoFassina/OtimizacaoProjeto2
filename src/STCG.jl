@@ -18,6 +18,8 @@ function STCG(nlp;x :: AbstractVector=copy(nlp.meta.x0),
     η = 1e-3
     iter = 0
     ϵ = atol + rtol * norm(gx)
+
+    status =:unknown
     
     p= x .* 0 
     while norm(∇f(x)) > ϵ
