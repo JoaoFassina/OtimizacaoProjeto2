@@ -10,13 +10,14 @@ function STCG(nlp;x :: AbstractVector=copy(nlp.meta.x0),
     Δt = time() - t₀
 
     max_time = 30
-    ϵ = atol + rtol * norm(gx)
     f(x) = obj(nlp,x)
     ∇f(x) = grad(nlp,x)
+    gx = ∇f(x)
     H(x) = hess(nlp,x)
     Δ = 1.0
     η = 1e-3
     iter = 0
+    ϵ = atol + rtol * norm(gx)
     
     p= x .* 0 
     while norm(∇f(x)) > ϵ
