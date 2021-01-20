@@ -6,7 +6,8 @@ using LinearAlgebra
 using CUTEst
 using NLPModels, LinearOperators, Krylov, SolverTools, SolverBenchmark
 
-function newtonar(nlp ; max_time = 3, max_iter = 100_00, η₁ = 1e-2, atol = 1e-6 ,rtol = 1e-6)
+function newtonar(nlp ;x :: AbstractVector=copy(nlp.meta.x0),
+    atol :: Real=√eps(eltype(x)), rtol :: Real=√eps(eltype(x)), max_time = 30, max_iter = 1_000_000, η₁ = 1e-2)
     t₀ = time()
     Δt = time() - t₀
     iter = 0

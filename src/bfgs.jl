@@ -3,7 +3,7 @@ using CUTEst
 using NLPModels, LinearOperators, Krylov, SolverTools, SolverBenchmark,JuMP, Ipopt
 
 function bfgs(nlp; x :: AbstractVector=copy(nlp.meta.x0),
-  atol :: Real=√eps(eltype(x)), rtol :: Real=√eps(eltype(x)), max_iter = 100_000, max_time = 3)
+  atol :: Real=√eps(eltype(x)), rtol :: Real=√eps(eltype(x)), max_iter = 1_000_000, max_time = 30)
 
   f(x) = obj(nlp,x)
   fx = f(x)

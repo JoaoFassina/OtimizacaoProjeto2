@@ -1,4 +1,4 @@
-export gradienteCon
+export newtonmodar
 
 using ForwardDiff
 using JSOSolverTemplate
@@ -6,8 +6,7 @@ using LinearAlgebra
 using CUTEst
 using NLPModels, LinearOperators, Krylov, SolverTools, SolverBenchmark
 
-
-function gradienteCon(nlp ;x :: AbstractVector=copy(nlp.meta.x0),
+function newtonmodar(nlp ;x :: AbstractVector=copy(nlp.meta.x0),
     atol :: Real=√eps(eltype(x)), rtol :: Real=√eps(eltype(x)), max_time = 30, max_iter = 1_000_000, η₁ = 1e-2)
     t₀ = time()
     Δt = time() - t₀
@@ -15,6 +14,7 @@ function gradienteCon(nlp ;x :: AbstractVector=copy(nlp.meta.x0),
     
     f(x) = obj(nlp,x)
     ∇f(x) = grad(nlp,x)
+    H(x) = Symmetric(hess(nlp, x), :L)
     fx = f(x)
     gx = ∇f(x)
     
@@ -26,8 +26,24 @@ function gradienteCon(nlp ;x :: AbstractVector=copy(nlp.meta.x0),
     
     resolvido = norm(gx) < ϵ
     cansado = Δt > max_time || iter > max_iter
+    Hx = H(x)
+    β = norm(Hx,2)
+    v = Vector{Float64}()
+    for i in 1:size(hess(nlp,x))[1]
+        push!(v,hess(nlp,x)[i,i])
+    end
+    if minimum(v) > 0
+        τ = 0
+    else
+        τ = β/2
+    end
+    F = cholesky(Hx + I*τ, check=false)
     while !(cansado || resolvido)
-        d = -gx
+        while (!issuccess(F))
+            τ = max(2τ,β/2)
+            F = cholesky(Hx + I*τ, check=false)
+        end
+        d = -(F \ gx)
         slope = dot(gx,d)
         
         α = 1.0
@@ -67,3 +83,4 @@ function gradienteCon(nlp ;x :: AbstractVector=copy(nlp.meta.x0),
     
     return GenericExecutionStats(status,nlp,objective=fx,solution=x,dual_feas=norm(gx),iter = iter, elapsed_time = Δt)
 end
+
