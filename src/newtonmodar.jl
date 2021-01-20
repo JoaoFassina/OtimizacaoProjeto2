@@ -40,6 +40,11 @@ function newtonmodar(nlp ;x :: AbstractVector=copy(nlp.meta.x0),
     F = cholesky(Hx + I*τ, check=false)
     while !(cansado || resolvido)
         while (!issuccess(F))
+            Δt = time() - t₀
+            if Δt >max_time
+                status = :max_time
+                break
+            end
             τ = max(2τ,β/2)
             F = cholesky(Hx + I*τ, check=false)
         end
