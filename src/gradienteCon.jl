@@ -8,7 +8,7 @@ using NLPModels, LinearOperators, Krylov, SolverTools, SolverBenchmark
 
 
 function gradienteCon(nlp ;x :: AbstractVector=copy(nlp.meta.x0),
-    atol :: Real=√eps(eltype(x)), rtol :: Real=√eps(eltype(x)), max_time = 30, max_iter = 1_000_000, η₁ = 1e-2)
+    atol :: Real=√eps(eltype(x)), rtol :: Real=√eps(eltype(x)), max_time = 30.0, max_iter = 1_000_000, η₁ = 1e-2)
     t₀ = time()
     Δt = time() - t₀
     iter = 0
