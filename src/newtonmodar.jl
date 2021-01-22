@@ -30,6 +30,11 @@ function newtonmodar(nlp ;x :: AbstractVector=copy(nlp.meta.x0),
     β = norm(Hx,2)
     v = Vector{Float64}()
     for i in 1:size(hess(nlp,x))[1]
+        Δt = time() - t₀
+        if Δt >max_time
+            status = :max_time
+            break
+        end
         push!(v,hess(nlp,x)[i,i])
     end
     if minimum(v) > 0
