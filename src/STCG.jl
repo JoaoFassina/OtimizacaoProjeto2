@@ -14,8 +14,8 @@ function STCG(nlp;x :: AbstractVector=copy(nlp.meta.x0),
     gx = ∇f(x)
     H(x) = hess(nlp,x)
     Δ = 1.0
-    η1 = 1e-2
-    η2 = 0.75
+    η₁ = 1e-2
+    η₂ = 0.75
     iter = 0
     ϵ = atol + rtol * norm(gx)
 
