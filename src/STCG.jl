@@ -21,9 +21,10 @@ function STCG(nlp;x :: AbstractVector=copy(nlp.meta.x0),
     status =:unknown
     
     p= x .* 0 
+    z = zero(∇f(x))
     while norm(∇f(x)) > ϵ
         
-        z = zero(∇f(x))
+        
         r = ∇f(x)
         d = -r
         n = length(∇f(x))
