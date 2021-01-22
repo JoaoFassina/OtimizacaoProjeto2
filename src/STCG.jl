@@ -14,8 +14,7 @@ function STCG(nlp;x :: AbstractVector=copy(nlp.meta.x0),
     gx = ∇f(x)
     H(x) = hess(nlp,x)
     Δ = 1.0
-    η₁ = 1e-2
-    η₂ = 0.75
+    η = 1e-3
     iter = 0
     ϵ = atol + rtol * norm(gx)
 
@@ -91,13 +90,18 @@ function STCG(nlp;x :: AbstractVector=copy(nlp.meta.x0),
         
         ρ = ared/pred
 
-        if ρ < η₁
-            Δ = Δ / 2
-        elseif ρ < η₂
+        if norm(ρ) < 0.25
+            Δ = 0.25*Δ
+        elseif norm(ρ) > 0.75 && norm(ρ) == Δ
+            Δ = min(2*Δ, ϵ)
+        else 
+             Δ = Δ
+        end
+        
+        if norm(ρ) > η
             x = x + p
         else
-            x = x + p
-            Δ = 2Δ
+            x = x
         end
 
         Δt = time() - t₀
