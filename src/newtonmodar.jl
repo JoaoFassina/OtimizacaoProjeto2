@@ -69,6 +69,7 @@ function newtonmodar(nlp ;x :: AbstractVector=copy(nlp.meta.x0),
         x .= x⁺
         fx = f⁺
         gx = ∇f(x)
+        Hx = H(x)
         
         resolvido = norm(gx) < ϵ
         Δt = time() - t₀
