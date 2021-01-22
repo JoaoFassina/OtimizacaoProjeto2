@@ -55,6 +55,11 @@ function newtonmodar(nlp ;x :: AbstractVector=copy(nlp.meta.x0),
         x⁺ = x + α * d
         f⁺ = f(x⁺)
         while f⁺ ≥ fx + η₁ * α * slope
+            Δt = time() - t₀
+            if Δt >max_time
+                status = :max_time
+                break
+            end
             α = α / 2
             x⁺ = x + α * d
             f⁺ = f(x⁺)
