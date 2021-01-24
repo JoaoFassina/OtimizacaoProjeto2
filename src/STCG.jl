@@ -79,10 +79,18 @@ function STCG(nlp;x :: AbstractVector=copy(nlp.meta.x0),
             dnew = -rnew + βnew*d 
 
             #end 3rd test
-
+            if Δt > max_time
+                status = :max_time
+                break
+            end
+        
+            if iter > max_iter	
+                status = :max_iter	
+                break	
+            end
             z, r, d = znew, rnew, dnew
         end
-        
+        Δt = time() - t₀
         
         
         ared = f(x) - f(x + p)
