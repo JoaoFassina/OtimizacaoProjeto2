@@ -5,11 +5,10 @@ using CUTEst
 using NLPModels, LinearOperators, Krylov, SolverTools, SolverBenchmark,JuMP, Ipopt
 
 function STCG(nlp;x :: AbstractVector=copy(nlp.meta.x0),
-    atol :: Real=√eps(eltype(x)), rtol :: Real=√eps(eltype(x)),max_iter = 1_000_000,max_time = 30.0)
+    atol :: Real=√eps(eltype(x)), rtol :: Real=√eps(eltype(x)),max_iter = 1_000_000, max_time = 30.0)
     t₀ = time()
     Δt = time() - t₀
 
-    
     f(x) = obj(nlp,x)
     ∇f(x) = grad(nlp,x)
     gx = ∇f(x)
@@ -82,13 +81,6 @@ function STCG(nlp;x :: AbstractVector=copy(nlp.meta.x0),
             #end 3rd test
 
             z, r, d = znew, rnew, dnew
-
-            Δt = time() - t₀
-        if iter > max_iter
-            status = :max_iter
-            break
-        end
-
         end
         
         
@@ -114,7 +106,7 @@ function STCG(nlp;x :: AbstractVector=copy(nlp.meta.x0),
 
         Δt = time() - t₀
         iter += 1 
-        
+       
         if iter > max_iter
             status = :max_iter
             break
