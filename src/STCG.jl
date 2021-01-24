@@ -5,15 +5,15 @@ using CUTEst
 using NLPModels, LinearOperators, Krylov, SolverTools, SolverBenchmark,JuMP, Ipopt
 
 function STCG(nlp;x :: AbstractVector=copy(nlp.meta.x0),
-    atol :: Real=√eps(eltype(x)), rtol :: Real=√eps(eltype(x)),max_iter = 1_000_000, max_time = 30.0)
+    atol :: Real=√eps(eltype(x)), rtol :: Real=√eps(eltype(x)),max_iter = 1_000_000,max_time = 30)
     t₀ = time()
     Δt = time() - t₀
 
+    
     f(x) = obj(nlp,x)
     ∇f(x) = grad(nlp,x)
     gx = ∇f(x)
-    H(x) = hess(nlp,x) 
-    
+    H(x) = hess(nlp,x)
     Δ = 1.0
     η = 1e-3
     iter = 0
@@ -21,10 +21,8 @@ function STCG(nlp;x :: AbstractVector=copy(nlp.meta.x0),
 
     status =:unknown
     
-    p = x .* 0 
+    p= x .* 0 
     z = zero(∇f(x))
-
-    
     while norm(∇f(x)) > ϵ
         
         
@@ -34,9 +32,6 @@ function STCG(nlp;x :: AbstractVector=copy(nlp.meta.x0),
         fx = f(x)
         gx = ∇f(x)
         Hx = H(x)
-        D = Hx'
-        ĝx = inv(D') * gx
-        B̂x = inv(D') * Hx * inv(D)
 
         if norm(r) < ϵ  
             p = z
@@ -44,10 +39,10 @@ function STCG(nlp;x :: AbstractVector=copy(nlp.meta.x0),
     
         for j = 1:n
             
-            if dot(d, B̂x*d) ≤ 0 
+            if dot(d, Hx*d) ≤ 0 
                 model = Model(with_optimizer(Ipopt.Optimizer, print_level=0))
                 @variable(model, t)
-                @objective(model, Min, fx + dot(ĝx, z + t*d) + dot((z + t*d), B̂x*(z + t*d))/2)
+                @objective(model, Min, fx + dot(gx, z + t*d) + dot((z + t*d), Hx*(z + t*d))/2)
                 for i = 1:length(z)
                     @constraint(model, (z[i] + t*d[i])^2 == Δ^2)
                 end
@@ -56,7 +51,7 @@ function STCG(nlp;x :: AbstractVector=copy(nlp.meta.x0),
                 τ = value.(t)
                 p = z + τ*d
             end
-            α = dot(r, r)/dot(d, B̂x*d)
+            α = dot(r, r)/dot(d, Hx*d)
             znew = z + α*d
             
             #end 1st test
@@ -73,7 +68,7 @@ function STCG(nlp;x :: AbstractVector=copy(nlp.meta.x0),
                 τ = value.(t) 
                 p = z + τ*d
             end
-            rnew = r + α*B̂x*d
+            rnew = r + α*Hx*d
 
             #end 2nd test
 
@@ -87,12 +82,19 @@ function STCG(nlp;x :: AbstractVector=copy(nlp.meta.x0),
             #end 3rd test
 
             z, r, d = znew, rnew, dnew
+
+            Δt = time() - t₀
+        if iter > max_iter
+            status = :max_iter
+            break
+        end
+
         end
         
         
         
         ared = f(x) - f(x + p)
-        pred = f(x) - (fx + dot(ĝx, p) + dot(p, B̂x*p)/2) 
+        pred = f(x) - (fx + dot(gx, p) + dot(p, Hx*p)/2) 
         
         ρ = ared/pred
 
@@ -112,7 +114,7 @@ function STCG(nlp;x :: AbstractVector=copy(nlp.meta.x0),
 
         Δt = time() - t₀
         iter += 1 
-       
+        
         if iter > max_iter
             status = :max_iter
             break
