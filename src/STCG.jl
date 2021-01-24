@@ -5,7 +5,7 @@ using CUTEst
 using NLPModels, LinearOperators, Krylov, SolverTools, SolverBenchmark,JuMP, Ipopt
 
 function STCG(nlp;x :: AbstractVector=copy(nlp.meta.x0),
-    atol :: Real=√eps(eltype(x)), rtol :: Real=√eps(eltype(x)),max_iter = 1_000_000,max_time = 30)
+    atol :: Real=√eps(eltype(x)), rtol :: Real=√eps(eltype(x)),max_iter = 1_000_000,max_time = 30.0)
     t₀ = time()
     Δt = time() - t₀
 
